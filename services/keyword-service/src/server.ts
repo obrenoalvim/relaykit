@@ -1,0 +1,7 @@
+import { createApp, SERVICE_NAME } from './app.js';
+
+const PORT = Number(process.env.PORT ?? 4003);
+
+createApp().listen(PORT, () => {
+  console.log(`[${SERVICE_NAME}] listening on port ${PORT}`);
+});

@@ -1,0 +1,75 @@
+services:
+  stats-service:
+    build:
+      context: .
+      dockerfile: services/stats-service/Dockerfile
+    ports:
+      - '4001:4001'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:4001/health']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  lang-service:
+    build:
+      context: .
+      dockerfile: services/lang-service/Dockerfile
+    ports:
+      - '4002:4002'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:4002/health']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  keyword-service:
+    build:
+      context: .
+      dockerfile: services/keyword-service/Dockerfile
+    ports:
+      - '4003:4003'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:4003/health']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - '4000:4000'
+    environment:
+      STATS_SERVICE_URL: http://stats-service:4001
+      LANG_SERVICE_URL: http://lang-service:4002
+      KEYWORD_SERVICE_URL: http://keyword-service:4003
+    depends_on:
+      stats-service:
+        condition: service_healthy
+      lang-service:
+        condition: service_healthy
+      keyword-service:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:4000/health']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_GATEWAY_URL: http://localhost:4000
+    ports:
+      - '3000:3000'
+    depends_on:
+      gateway:
+        condition: service_healthy
