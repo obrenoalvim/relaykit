@@ -1,8 +1,25 @@
+<div align="center">
+
+<img src=".github/logo.svg" alt="Logo do RelayKit" width="120" height="120">
+
 # RelayKit
 
-[![CI](https://github.com/obrenoalvim/relaykit/actions/workflows/ci.yml/badge.svg)](https://github.com/obrenoalvim/relaykit/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**Um demo funcional de microsserviços com um gateway que degrada com elegância.**<br>
+Um gateway distribui texto para três serviços especialistas, agrega as respostas e continua respondendo quando um deles cai. Um dashboard ao vivo mostra cada nó e cada circuit breaker.
 
-[🇺🇸 Read in English](README.md)
+[![CI](https://github.com/obrenoalvim/relaykit/actions/workflows/ci.yml/badge.svg)](https://github.com/obrenoalvim/relaykit/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/obrenoalvim/relaykit?style=flat&logo=github&color=38bdf8)](https://github.com/obrenoalvim/relaykit/stargazers)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](#como-rodar)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](#estrutura-do-projeto)
+
+[English](README.md) · **Português**
+
+[O que faz](#o-que-faz) · [Arquitetura](#arquitetura) · [Como rodar](#como-rodar) · [API](#api) · [Testes](#testes) · [Perguntas frequentes](#perguntas-frequentes)
+
+</div>
+
+---
 
 Um demo funcional de microsserviços. Um gateway repassa texto pra três
 serviços especialistas, agrega as respostas e degrada com elegância quando um
@@ -34,10 +51,10 @@ O status HTTP reflete isso: `200` quando todos os especialistas respondem,
 frontend (3000)
    |
    v
-gateway (4000)  -- timeout, retry e circuit breaker por servico --
+gateway (4000)  [timeout, retry e circuit breaker por serviço]
    |-- stats-service   (4001)   contagem de palavras/frases, score Flesch
-   |-- lang-service    (4002)   deteccao de idioma por frequencia de stopwords
-   |-- keyword-service (4003)   ranking de palavras-chave por frequencia
+   |-- lang-service    (4002)   detecção de idioma por frequência de stopwords
+   |-- keyword-service (4003)   ranking de palavras-chave por frequência
 ```
 
 Cada especialista é um app Express pequeno com duas rotas: `POST /analyze` e
@@ -154,6 +171,44 @@ estatístico. Ela só precisa distinguir cinco idiomas pra um demo, e uma
 heurística sem dependência externa é determinística, rápida de testar e não
 carrega nenhum arquivo de dados externo.
 
+---
+
+## Perguntas frequentes
+
+**O que significa o status 207?**
+O gateway devolve `200` quando todos os especialistas respondem e `207` quando um ou mais não responderam. A resposta ainda traz os resultados que voltaram.
+
+**Preciso de Docker?**
+O Docker sobe a stack completa com `docker compose up --build`. Sem Docker, rode os cinco processos com os scripts npm de [Desenvolvimento local sem Docker](#desenvolvimento-local-sem-docker).
+
+**O circuit breaker e o retry vêm de uma biblioteca?**
+Não. Foram escritos à mão, e o circuit breaker fica em um arquivo só: `services/gateway/src/circuitBreaker.ts`.
+
+**Como ele detecta o idioma?**
+Pela frequência de stopwords em inglês, português, espanhol, francês e alemão. É uma heurística sem dependências, não um modelo estatístico.
+
+**Como vejo a degradação?**
+Rode `docker compose stop lang-service` com a stack no ar e envie o texto de novo. O card de idioma mostra "unavailable" enquanto estatísticas e palavras-chave continuam funcionando.
+
+## Mais do mesmo autor
+
+- [**status-hub**](https://github.com/obrenoalvim/status-hub): um grid só para toda página de status que você confere.
+- [**echoport**](https://github.com/obrenoalvim/echoport): scanner de portas localhost em tempo real para devs.
+
+## Contribuindo
+
+Bug ou ideia? Abra uma issue ou um PR. Veja o [CONTRIBUTING.md](CONTRIBUTING.md) e o [changelog](CHANGELOG.md).
+
 ## Licença
 
 MIT. Veja [LICENSE](LICENSE).
+
+---
+
+<div align="center">
+
+Se o RelayKit te ajudou a entender circuit breakers, uma ⭐ ajuda outras pessoas a encontrá-lo.
+
+<sub>**Tópicos:** microservices · api-gateway · circuit-breaker · resilience · graceful-degradation · fault-tolerance · distributed-systems · docker-compose · nextjs · typescript</sub>
+
+</div>
